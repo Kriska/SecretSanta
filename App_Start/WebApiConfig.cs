@@ -1,10 +1,10 @@
 ﻿using Autofac;
 using System.Web.Http;
-using System.Net.Http;
 using System.Reflection;
 using Autofac.Integration.WebApi;
-using SecretSanta.Repository;
 using SecretSanta.CrossDomain;
+using SecretSanta.Repository;
+using Newtonsoft.Json.Serialization;
 
 namespace SecretSanta
 {
@@ -16,9 +16,9 @@ namespace SecretSanta
             var builder = new ContainerBuilder();
 
             builder.RegisterType<Settings>().AsImplementedInterfaces().SingleInstance();
-           // builder.RegisterType<UserRepository>().As<IRepository<UserRepository, string>().SingleInstance();
+            builder.RegisterType<UserRepository>().AsImplementedInterfaces().SingleInstance();
            //za loginRepo builder.RegisterType<>().As<ICompetitionRepository>().SingleInstance();
-          //  builder.RegisterType<GlobalErrorHandler>().AsWebApiExceptionFilterFor<ApiController>();
+            builder.RegisterType<GlobalErrorHandler>().AsWebApiExceptionFilterFor<ApiController>();
 
             // вече не го слагаме просто като атрибут а го регистрираме тук
             // builder.RegisterType<AuthenticationFilterAttribute>().AsWebApiActionFilterFor<SnailsController>().InstancePerRequest();
@@ -31,7 +31,7 @@ namespace SecretSanta
 
             IContainer container = builder.Build();
             config.DependencyResolver = new AutofacWebApiDependencyResolver(container);
-
+        
             // Web API routes
             config.MapHttpAttributeRoutes();
 

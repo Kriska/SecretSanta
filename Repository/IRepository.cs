@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using SecretSanta.CrossDomain;
 
 namespace SecretSanta.Repository
 {
@@ -9,7 +10,7 @@ namespace SecretSanta.Repository
 
         Task<TEntityType> SelectById(TKeyType id);
 
-        Task Insert(TEntityType entity);
+        Task<TEntityType> Insert(TEntityType entity);
 
         Task Update(TEntityType entity);
 
