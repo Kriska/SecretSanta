@@ -4,7 +4,7 @@ using System.Reflection;
 using Autofac.Integration.WebApi;
 using SecretSanta.CrossDomain;
 using SecretSanta.Repository;
-using Newtonsoft.Json.Serialization;
+using SecretSanta.Controllers;
 
 namespace SecretSanta
 {
@@ -17,14 +17,16 @@ namespace SecretSanta
 
             builder.RegisterType<Settings>().AsImplementedInterfaces().SingleInstance();
             builder.RegisterType<UserRepository>().AsImplementedInterfaces().SingleInstance();
-           //za loginRepo builder.RegisterType<>().As<ICompetitionRepository>().SingleInstance();
+            builder.RegisterType<LoginRepository>().AsImplementedInterfaces().SingleInstance();
+            builder.RegisterType<GroupRepository>().AsImplementedInterfaces().SingleInstance();
             builder.RegisterType<GlobalErrorHandler>().AsWebApiExceptionFilterFor<ApiController>();
 
-            // вече не го слагаме просто като атрибут а го регистрираме тук
-            // builder.RegisterType<AuthenticationFilterAttribute>().AsWebApiActionFilterFor<SnailsController>().InstancePerRequest();
-
+            builder.RegisterType<AuthenticationFilterAttribute>().
+                AsWebApiActionFilterFor<UsersController>().InstancePerRequest();
+            builder.RegisterType<AuthenticationFilterAttribute>().
+               AsWebApiActionFilterFor<GroupsController>().InstancePerRequest();
             // регистрация на Delegating handler
-           // builder.RegisterType<ExampleDelegatingHandler>().As<DelegatingHandler>().InstancePerRequest();
+            // builder.RegisterType<ExampleDelegatingHandler>().As<DelegatingHandler>().InstancePerRequest();
 
             builder.RegisterApiControllers(Assembly.GetExecutingAssembly());
             builder.RegisterWebApiFilterProvider(config);
@@ -37,8 +39,13 @@ namespace SecretSanta
 
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
-                routeTemplate: "api/{controller}/{id}",
-                defaults: new { id = RouteParameter.Optional }
+                routeTemplate: "api/{controller}/{userName}",
+                defaults: new { userName = RouteParameter.Optional }
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "InvitationApi",
+                routeTemplate: "api/{controller}/{userName}/{action}"
             );
         }
     }

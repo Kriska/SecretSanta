@@ -23,11 +23,12 @@ namespace SecretSanta.Repository
         {
             using (var connection = CreateConnection())
             {
-                var users = await connection.QueryAsync<User>("SELECT * FROM users").ConfigureAwait(false);
-                int found = users.ToList().FindIndex(x => x.DisplayName == entity.DisplayName);
-                if(found != -1)
+                var users = await connection.QueryAsync<User>
+                     (@"SELECT * FROM users WHERE users.userName = @UserName", entity).ConfigureAwait(false);
+                var found = users.ToList();
+                if (found.Count() <= 0)
                 {
-                    throw new ConflictException("The given displayName is not unique");
+                    throw new ConflictException("The given userName is not unique");
                 }
                await connection.ExecuteAsync(@"INSERT INTO 
                     users (userName, displayName, password)
@@ -47,13 +48,46 @@ namespace SecretSanta.Repository
             }
         }
 
-        public Task<User> SelectById(string id)
+        public async Task<User> SelectByUserName(string userName)
+        {
+            using (var connection = CreateConnection())
+            {
+                var users = await connection.QueryAsync<User>
+                    (@"SELECT * FROM users WHERE users.userName = @UserName", new { UserName = userName })
+                    .ConfigureAwait(false);
+
+                var result = users.ToList();
+                if(result.Count > 0)
+                {
+                   var foundUser = result.ElementAt(0);
+                    return foundUser;
+                }
+                throw new NotFoundException("User not found");
+            }
+        }
+
+        public Task<User> SelectById(int id)
         {
             throw new NotImplementedException();
         }
-
-        public Task Update(User entity)
+        public Task<User> Update(User entity)
         {
+            throw new NotImplementedException();
+        }
+        public Task<User> GetUserByLogin(Login login)
+        {
+            //won't be implemented
+            throw new NotImplementedException();
+        }
+        public async Task<User> SelectByToken(string token)
+        {
+            //wont be implemented
+            throw new NotImplementedException();
+        }
+
+        public Task<User> SelectByGroupName(string groupName)
+        {
+            //won't be implemented
             throw new NotImplementedException();
         }
     }

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using SecretSanta.CrossDomain;
+using SecretSanta.Entities;
 
 namespace SecretSanta.Repository
 {
@@ -8,11 +8,16 @@ namespace SecretSanta.Repository
     {
         Task<IEnumerable<TEntityType>> SelectAll();
 
-        Task<TEntityType> SelectById(TKeyType id);
+        Task<TEntityType> SelectByUserName(string userName); //for userRepository
+
+        Task<TEntityType> SelectByToken(TKeyType id); //for loginRepository
+        Task<TEntityType> SelectByGroupName(TKeyType groupName); //for groupRepository
+
+        Task<User> GetUserByLogin(Login login);
 
         Task<TEntityType> Insert(TEntityType entity);
 
-        Task Update(TEntityType entity);
+        Task<TEntityType> Update(TEntityType entity);
 
         Task Delete(TKeyType id);
     }

@@ -14,7 +14,8 @@ namespace SecretSanta.CrossDomain
         {
             // Логваме, трейсваме и подобни, после скриваме грешката зад 500
             if (!(actionExecutedContext.Exception is HttpResponseException))
-                actionExecutedContext.Response = actionExecutedContext.Request.CreateResponse(HttpStatusCode.InternalServerError);
+                actionExecutedContext.Response = actionExecutedContext.Request.CreateResponse(HttpStatusCode.InternalServerError,
+                    actionExecutedContext.Exception);
 
             return base.OnExceptionAsync(actionExecutedContext, cancellationToken);
         }
