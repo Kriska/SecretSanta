@@ -64,7 +64,7 @@ namespace SecretSanta.Controllers
         }
 
         [HttpPost]
-        public async Task<IHttpActionResult> invitations([FromUri] string userName, Invitation invitation)
+        public async Task<IHttpActionResult> CreateInvitation([FromUri] string userName, Invitation invitation)
         {
             try
             {
@@ -73,7 +73,7 @@ namespace SecretSanta.Controllers
                 var admin = await _userRepository.SelectByUserName(invitation.AdminName).ConfigureAwait(false);
                 if (group.IdAdmin == admin.Id)
                 {
-                    group.IdParticipant = user.Id;
+                    group.IdInvited = user.Id;
                 } else
                 {
                     return StatusCode(HttpStatusCode.Forbidden);
@@ -87,6 +87,46 @@ namespace SecretSanta.Controllers
                 return NotFound();
             }
 
+
+        }
+        [HttpGet]
+        public async Task<IHttpActionResult> CheckInvitations([FromUri] string userName, [FromUri]int skip = 1, [FromUri]int take = 1,
+            [FromUri]char order = 'A')
+        {
+            if (_currentUser.UserName != userName)
+            {
+                return StatusCode(HttpStatusCode.Forbidden);
+            }
+            var groups = await _groupRepository.SelectAllInvitations(_currentUser.Id).ConfigureAwait(false);
+            if (order == 'A')
+            {
+                return Ok(groups.Skip((skip - 1) * take).Take(take).OrderBy(x => x.GroupName));
+            }
+            if (order == 'D')
+            {
+                return Ok(groups.Skip((skip - 1) * take).Take(take).OrderByDescending(x => x.GroupName));
+            }
+            return BadRequest();
+        }
+
+        [HttpDelete]
+        public async Task<IHttpActionResult> RejectInvitation([FromUri] string userName, [FromUri]string groupName)
+        {
+            if(_currentUser.UserName != userName)
+            {
+                return StatusCode(HttpStatusCode.Forbidden);
+            }
+            var groups = await _groupRepository.SelectAllInvitations(_currentUser.Id).ConfigureAwait(false);
+            var found = groups.Where(x => x.GroupName == groupName);
+            if (found.Count() <= 0)
+            {
+                return NotFound();
+            }
+            foreach(Group group in found)
+            {
+               await _groupRepository.Delete(group.Id.ToString()).ConfigureAwait(false);
+            }
+            return StatusCode(HttpStatusCode.NoContent);
 
         }
     }

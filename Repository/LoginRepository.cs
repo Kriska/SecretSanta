@@ -81,5 +81,11 @@ namespace SecretSanta.Repository
             //won't be impelemented
             throw new System.NotImplementedException();
         }
+
+        public Task<IEnumerable<Login>> SelectAllInvitations(int idParticipant)
+        {
+            //won't be implemented
+            throw new System.NotImplementedException();
+        }
     }
 }

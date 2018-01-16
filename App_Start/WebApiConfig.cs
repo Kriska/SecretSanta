@@ -45,7 +45,13 @@ namespace SecretSanta
 
             config.Routes.MapHttpRoute(
                 name: "InvitationApi",
-                routeTemplate: "api/{controller}/{userName}/{action}"
+                routeTemplate: "api/{controller}/{userName}/invitations/{groupName}",
+                defaults: new { groupName = RouteParameter.Optional }
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "ParticipantApi",
+                routeTemplate: "api/{controller}/{groupName}/participants"
             );
         }
     }

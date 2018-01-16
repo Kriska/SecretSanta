@@ -15,11 +15,15 @@ namespace SecretSanta.Repository
         {
         }
 
-        public Task Delete(string id)
+        public async Task Delete(string id)
         {
-            throw new NotImplementedException();
+            using (var connection = CreateConnection())
+            {
+                var logins = await connection.ExecuteAsync(
+                @"DELETE FROM groups WHERE id= @Id", new { Id = id }).ConfigureAwait(false);
+            }
         }
-        
+
         public async Task<Group> Insert(Group entity)
         {
             
@@ -50,7 +54,7 @@ namespace SecretSanta.Repository
             using (var connection = CreateConnection())
             {
                 var groups = await connection.QueryAsync<Group>
-                    (@"SELECT * FROM groups WHERE groupName = @GroupName AND idParticipant is NULL",
+                    (@"SELECT * FROM groups WHERE groupName = @GroupName AND idInvited is NULL",
                      new { GroupName = groupName}).ConfigureAwait(false);
                 var found = groups.ToList();
                 if (found.Count() <= 0)
@@ -80,7 +84,7 @@ namespace SecretSanta.Repository
             throw new NotImplementedException();
         }
 
-        public Task<Group> SelectByUserName(string userName)
+        public Task<IEnumerable<Group>> SelectByUserName(string userName)
         {
             //won't be implemented
             throw new NotImplementedException();
@@ -94,10 +98,34 @@ namespace SecretSanta.Repository
         {
             using (var connection = CreateConnection())
             {
-                await connection.ExecuteAsync(@"UPDATE groups set idParticipant = @IdParticipant
+                if(entity.IdParticipant != 0)
+                {
+                    await connection.ExecuteAsync(@"UPDATE groups set idParticipant = @IdParticipant, idInvited = NULL
                     WHERE groups.groupName = @GroupName and idParticipant is NULL", entity).ConfigureAwait(false);
 
+                } else
+                {
+                    await connection.ExecuteAsync(@"UPDATE groups set idInvited = @IdInvited
+                    WHERE groups.groupName = @GroupName and idInvited is NULL", entity).ConfigureAwait(false);
+                }
+
                 return entity;
+            }
+        }
+
+        Task<Group> IRepository<Group, string>.SelectByUserName(string userName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<Group>> SelectAllInvitations(int idInvited)
+        {
+            using (var connection = CreateConnection())
+            {
+                var groups =await connection.QueryAsync<Group>(@"SElECT * from groups WHERE idInvited = @IdInvited",
+                    new { IdInvited = idInvited }).ConfigureAwait(false);
+
+                return groups.ToList();
             }
         }
     }

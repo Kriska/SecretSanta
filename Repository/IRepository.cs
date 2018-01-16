@@ -12,6 +12,7 @@ namespace SecretSanta.Repository
 
         Task<TEntityType> SelectByToken(TKeyType id); //for loginRepository
         Task<TEntityType> SelectByGroupName(TKeyType groupName); //for groupRepository
+        Task<IEnumerable<TEntityType>> SelectAllInvitations(int idInvited); //for groupRepository
 
         Task<User> GetUserByLogin(Login login);
 

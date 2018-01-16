@@ -11,14 +11,16 @@ namespace SecretSanta.Entities
         public int IdAdmin { get; set; }
         public int IdReceiver { get; set; }
         public int IdParticipant { get; set; }
+        public int IdInvited { get; set; }
         public string GroupName { get; set; }
 
-        public Group(int id, int idAdmin,int idParticipant, int idReceiver, string groupName)
+        public Group(int id, int idAdmin,int idParticipant, int idReceiver, int idInvited, string groupName)
         {
             this.Id = id;
             this.IdAdmin = idAdmin;
             this.IdReceiver = idReceiver;
             this.IdParticipant = idParticipant;
+            this.IdInvited = idInvited;
             this.GroupName = groupName;
         }
 

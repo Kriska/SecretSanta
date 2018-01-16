@@ -19,7 +19,7 @@ namespace SecretSanta.Controllers
             _userRepository = userRepository;
         }
 
-        [HttpPost]
+      [HttpPost]
       public async Task<IHttpActionResult> Login(User user)
       {
             try
@@ -43,7 +43,6 @@ namespace SecretSanta.Controllers
         [HttpDelete]
         public async Task<IHttpActionResult> logout([FromUri]string userName)
         {
-            //ot userName da namerish UserId i da go iztriesh toq
             try
             {
                 var loginUser = await _userRepository.SelectByUserName(userName).ConfigureAwait(false);
