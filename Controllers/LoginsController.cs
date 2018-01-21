@@ -2,57 +2,54 @@
 using System.Web.Http;
 using SecretSanta.Repository;
 using SecretSanta.Entities;
-using SecretSanta.CrossDomain;
 using System.Threading.Tasks;
+using System;
 using System.Net;
 
 namespace SecretSanta.Controllers
 {
     public class LoginsController : ApiController
     {
-        private readonly IRepository<Login, string> _loginRepository;
-        private readonly IRepository<User, string> _userRepository;
+        private readonly ILoginRepository _loginRepository;
+        private readonly IUserRepository _userRepository;
 
-        public LoginsController(IRepository<Login, string> loginRepository, IRepository<User, string> userRepository)
+        public LoginsController(ILoginRepository loginRepository, IUserRepository userRepository)
         {
             _loginRepository = loginRepository;
             _userRepository = userRepository;
         }
 
-      [HttpPost]
-      public async Task<IHttpActionResult> Login(User user)
-      {
-            try
-            {
-                var loginUser = await _userRepository.SelectByUserName(user.UserName).ConfigureAwait(false);
-                if(user.Password != loginUser.Password)
-                {
-                    return Unauthorized();
-                }
-                //imame user-a tr da mu vzemem id-to 
-                Login prepareLogin = new Login(loginUser.Id);
-                var login = await _loginRepository.Insert(prepareLogin).ConfigureAwait(false);
-                return Created(Request.RequestUri, prepareLogin.AuthnToken);
-            } catch(NotFoundException Exc)
-            {
-                return NotFound();
-            }
-        }
-
-        //da mine prez filter po nqkakv nachin
-        [HttpDelete]
-        public async Task<IHttpActionResult> logout([FromUri]string userName)
+        [HttpPost]
+        public async Task<IHttpActionResult> Login(User user)
         {
-            try
+           var loginUser = await _userRepository.SelectByKey(user.UserName).ConfigureAwait(false);
+            if(loginUser == null)
             {
-                var loginUser = await _userRepository.SelectByUserName(userName).ConfigureAwait(false);
-                await _loginRepository.Delete(loginUser.Id.ToString());
-                return StatusCode(HttpStatusCode.NoContent);
+                return Unauthorized();
             }
-            catch (NotFoundException Exc)
+            if (user.Password != loginUser.Password)
+            {
+                return Unauthorized();
+            }
+            string generatedToken = Guid.NewGuid().ToString("N");
+            Login prepareLogin = new Login(user.UserName, generatedToken);
+            var login = await _loginRepository.Insert(prepareLogin).ConfigureAwait(false);
+
+            return Created(Request.RequestUri, prepareLogin.AuthnToken);
+        }
+        
+        [HttpDelete]
+        public async Task<IHttpActionResult> Logout([FromUri]string userName)
+        {
+          
+            var loginUser = await _loginRepository.SelectByUserName(userName).ConfigureAwait(false);
+            if (loginUser == null)
             {
                 return NotFound();
             }
+            await _loginRepository.Delete(userName);
+            return StatusCode(HttpStatusCode.NoContent);
+           
         }
     }
 }

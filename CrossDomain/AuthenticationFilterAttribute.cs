@@ -15,36 +15,36 @@ namespace SecretSanta.CrossDomain
 {
     public class AuthenticationFilterAttribute : ActionFilterAttribute, IAutofacActionFilter
     {
-        private readonly IRepository<Login,string> _loginRepository;
+        private readonly ILoginRepository _loginRepository;
 
-        public AuthenticationFilterAttribute(IRepository<Login, string> loginRepository)
+        public AuthenticationFilterAttribute(ILoginRepository loginRepository)
         {
             _loginRepository = loginRepository;
         }
 
         public override async Task OnActionExecutingAsync(HttpActionContext actionContext, CancellationToken cancellationToken)
         {
-            IEnumerable<string> authValues;
-            if (!actionContext.Request.Headers.TryGetValues("AuthnToken", out authValues))
-                throw new HttpResponseException(HttpStatusCode.Unauthorized);
+        //    IEnumerable<string> authValues;
+        //    if (!actionContext.Request.Headers.TryGetValues("AuthnToken", out authValues))
+        //        throw new HttpResponseException(HttpStatusCode.Unauthorized);
 
-            Login login = await _loginRepository.SelectByToken(authValues.First());
-            if (login == null)
-            {
-                throw new HttpResponseException(HttpStatusCode.Unauthorized);
-            }   
+        //    Login login = await _loginRepository.SelectByToken(authValues.First());
+        //    if (login == null)
+        //    {
+        //        throw new HttpResponseException(HttpStatusCode.Unauthorized);
+        //    }   
 
-            User user = await _loginRepository.GetUserByLogin(login);
-            var currenController = actionContext.ControllerContext.ControllerDescriptor.ControllerName;
-            if(currenController == "Users")
-            {
-                ((UsersController)actionContext.ControllerContext.Controller).SetCurrentUser(user);
-            }
-            else
-            {
-                ((GroupsController)actionContext.ControllerContext.Controller).SetCurrentUser(user);
-            }
-            await base.OnActionExecutingAsync(actionContext, cancellationToken);
+        //    User user = await _loginRepository.GetUserByLogin(login);
+        //    var currenController = actionContext.ControllerContext.ControllerDescriptor.ControllerName;
+        //    if(currenController == "Users")
+        //    {
+        //        ((UsersController)actionContext.ControllerContext.Controller).SetCurrentUser(user);
+        //    }
+        //    else
+        //    {
+        //        ((GroupsController)actionContext.ControllerContext.Controller).SetCurrentUser(user);
+        //    }
+        //    await base.OnActionExecutingAsync(actionContext, cancellationToken);
         }
     }
 }
