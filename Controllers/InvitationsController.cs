@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 
 namespace SecretSanta.Controllers
 {
-    //FILTER ON WHOLE CLASS
     public class InvitationsController : ApiController
     {
         private readonly IUserRepository _userRepository;
@@ -24,11 +23,6 @@ namespace SecretSanta.Controllers
             _userRepository = userRepository;
             _groupRepository = groupRepository;
             _invitationRepository = invitationRepository;
-            //TO BE DELETED WHEN THIS COMES FROM FILTER
-            _currentUser = new User();
-            _currentUser.UserName = "krisi";
-            _currentUser.DisplayName = "krisi";
-            _currentUser.Password = "pass";
         }
         internal void SetCurrentUser(User user)
         {
@@ -53,7 +47,7 @@ namespace SecretSanta.Controllers
             prepareInvitation.UserName = userName;
             await _invitationRepository.Insert(prepareInvitation);
 
-            return Created(Request.RequestUri, prepareInvitation);
+            return Created(Request.RequestUri, new { prepareInvitation.GroupName, prepareInvitation.UserName });
 
         }
         [HttpGet]

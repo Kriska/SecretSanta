@@ -9,7 +9,7 @@ namespace SecretSanta.Repository
         Task<TEntityType> Insert(TEntityType entity);
         Task<TEntityType> SelectByKey(TKeyType key);
         Task<TEntityType> Update(TEntityType entity);
-        Task Delete(TKeyType id);
+        Task<int> Delete(TKeyType id);
         Task<IEnumerable<TEntityType>> SelectAll();
     }
 }

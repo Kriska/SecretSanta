@@ -41,7 +41,7 @@ namespace SecretSanta.Repository
         {
             throw new NotImplementedException();
         }
-        public Task Delete(string id)
+        public Task<int> Delete(string id)
         {
             throw new NotImplementedException();
         }

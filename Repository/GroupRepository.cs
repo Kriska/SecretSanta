@@ -27,12 +27,13 @@ namespace SecretSanta.Repository
             throw new NotImplementedException();
         }
 
-        public async Task Delete(string id)
+        public async Task<int> Delete(string id)
         {
             using (var connection = CreateConnection())
             {
                 var logins = await connection.ExecuteAsync(
                 @"DELETE FROM groups WHERE id= @Id", new { Id = id }).ConfigureAwait(false);
+                return logins;
             }
         }
         public Task<IEnumerable<Group>> SelectAll()

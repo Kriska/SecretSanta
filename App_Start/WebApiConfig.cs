@@ -24,23 +24,33 @@ namespace SecretSanta
             builder.RegisterType<GlobalErrorHandler>().AsWebApiExceptionFilterFor<ApiController>();
 
            //builder.RegisterType<AuthenticationFilterAttribute>().AsWebApiActionFilterFor<UsersController>().InstancePerRequest();
-            //builder.RegisterType<AuthenticationFilterAttribute>().AsWebApiActionFilterFor<GroupsController>().InstancePerRequest();
+            builder.RegisterType<AuthenticationFilterAttribute>().AsWebApiActionFilterFor<GroupsController>().InstancePerRequest();
+            builder.RegisterType<AuthenticationFilterAttribute>().AsWebApiActionFilterFor<InvitationsController>().InstancePerRequest();
+            builder.RegisterType<AuthenticationFilterAttribute>().AsWebApiActionFilterFor<LinksController>().InstancePerRequest();
+           // builder.RegisterType<AuthenticationFilterAttribute>().AsWebApiActionFilterFor<LoginsController>().InstancePerRequest();
+
+            builder.RegisterType<AuthenticationFilterAttribute>().AsWebApiActionFilterFor<LoginsController>(c => c.Logout());
+            builder.RegisterType<AuthenticationFilterAttribute>().AsWebApiActionFilterFor<UsersController>(c => c.GetAllUsers(1,1,null,"A"));
+            
+            
             // регистрация на Delegating handler
             // builder.RegisterType<ExampleDelegatingHandler>().As<DelegatingHandler>().InstancePerRequest();
 
             builder.RegisterApiControllers(Assembly.GetExecutingAssembly());
+
             builder.RegisterWebApiFilterProvider(config);
+
 
             IContainer container = builder.Build();
             config.DependencyResolver = new AutofacWebApiDependencyResolver(container);
-
+            
             // Web API routes
             config.MapHttpAttributeRoutes();
 
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
-                routeTemplate: "api/{controller}/{userName}",
-                defaults: new { userName = RouteParameter.Optional }
+                routeTemplate: "api/{controller}/{userName}/{groupName}",
+                defaults: new { userName = RouteParameter.Optional, groupName = RouteParameter.Optional }
             );
         }
     }

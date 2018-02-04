@@ -27,12 +27,13 @@ namespace SecretSanta.Repository
         {
             throw new System.NotImplementedException();
         }
-        public async Task Delete(string userName)
+        public async Task<int> Delete(string userName)
         {
             using (var connection = CreateConnection())
             {
-                var logins = await connection.ExecuteAsync(
+                var afected = await connection.ExecuteAsync(
                 @"DELETE FROM logins WHERE userName= @UserName", new { UserName = userName }).ConfigureAwait(false);
+                return afected;
             }
         }
         public Task<IEnumerable<Login>> SelectAll()

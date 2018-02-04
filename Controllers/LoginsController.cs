@@ -12,11 +12,16 @@ namespace SecretSanta.Controllers
     {
         private readonly ILoginRepository _loginRepository;
         private readonly IUserRepository _userRepository;
+        private User _currentUser;
 
         public LoginsController(ILoginRepository loginRepository, IUserRepository userRepository)
         {
             _loginRepository = loginRepository;
             _userRepository = userRepository;
+        }
+        internal void SetCurrentUser(User user)
+        {
+            _currentUser = user;
         }
 
         [HttpPost]
@@ -37,17 +42,15 @@ namespace SecretSanta.Controllers
 
             return Created(Request.RequestUri, prepareLogin.AuthnToken);
         }
-        
-        [HttpDelete]
-        public async Task<IHttpActionResult> Logout([FromUri]string userName)
+        //FILTERED
+        [HttpDelete] 
+        public async Task<IHttpActionResult> Logout()
         {
-          
-            var loginUser = await _loginRepository.SelectByUserName(userName).ConfigureAwait(false);
-            if (loginUser == null)
+            var result = await _loginRepository.Delete(_currentUser.UserName);
+            if (result <= 0)
             {
                 return NotFound();
             }
-            await _loginRepository.Delete(userName);
             return StatusCode(HttpStatusCode.NoContent);
            
         }

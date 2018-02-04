@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using SecretSanta.CrossDomain;
@@ -22,28 +23,52 @@ namespace SecretSanta.Repository
                 return entity;
             }
         }
-        public Task<Link> Update(Link entity)
+        public async Task<Link> Update(Link entity)
         {
-            throw new NotImplementedException();
+            using (var connection = CreateConnection())
+            {
+                await connection.ExecuteAsync(@"UPDATE links SET senderName = @SenderName
+                                                WHERE id = @Id", entity).ConfigureAwait(false);
+
+                return entity;
+            }
         }
-        public Task Delete(int id)
+        public async Task<int> Delete(int id)
         {
-            throw new NotImplementedException();
+            using (var connection = CreateConnection())
+            {
+               var affected =  await connection.ExecuteAsync(@"DELETE FROM links WHERE id= @Id",
+                                                new { Id = id }).ConfigureAwait(false);
+                return affected;
+            }
         }
 
-        public Task<IEnumerable<Link>> SelectAll()
+        public async Task<IEnumerable<Link>> SelectAll()
         {
-            throw new NotImplementedException();
+            using (var connection = CreateConnection())
+            {
+                var results = await connection.QueryAsync<Link>(@"SELECT * FROM links").ConfigureAwait(false);
+                if (results.Count() >= 0)
+                {
+                    return results;
+                }
+                return null;
+            }
         }
 
-        public Task<IEnumerable<Link>> SelectAllByGroupName(string groupName)
+        public async Task<IEnumerable<Link>> SelectAllByGroupName(string groupName)
         {
-            throw new NotImplementedException();
-        }
+            using (var connection = CreateConnection())
+            {
+                var results = await connection.QueryAsync<Link>(@"SELECT * FROM links WHERE groupName = @GroupName", 
+                                               new { GroupName = groupName }).ConfigureAwait(false);
+               if(results.Count() >= 0)
+                {
+                    return results;
+                }
+                return null;
+            }
 
-        public Task<IEnumerable<Link>> SelectByRecieverAndGroup(string recieverName, string groupName)
-        {
-            throw new NotImplementedException();
         }
         public Task<Link> SelectByKey(int key)
         {
